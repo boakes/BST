@@ -1,0 +1,5 @@
+BST STUFF
+
+In the iterator 
+	the boolean signifies the actual end to the iterator, but the node* should be the same spot as --end();
+
