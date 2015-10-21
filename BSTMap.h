@@ -134,16 +134,20 @@ public:
         }
     }
 
-    iterator find(const key_type& k);
+    iterator find(const key_type& k){
+        return iterator(search(root,k),false);
+    }
 
-    const_iterator find(const key_type& k) const;
+    const_iterator find(const key_type& k) const{
+        return const_iterator(search(root,k),false);
+    }
 
     unsigned int count(const key_type& k) const;
 
     std::pair<iterator,bool> insert(const value_type& val){
         Node* y = nullptr;
-        auto x = root;
-        auto z = new Node(nullptr,nullptr,nullptr,val.first,val.second);
+        Node* x = root;
+        Node* z = new Node(nullptr,nullptr,nullptr,val.first,val.second);
         while (x != nullptr){
             y = x;
             if(val.first != x->key){
@@ -158,6 +162,8 @@ public:
         } else{
             y->right = z;
         }
+        
+        return std::make_pair<iterator,bool> (iterator(z,false),true);
 
     }
 
@@ -171,16 +177,15 @@ public:
     void transplant(){}
 
     iterator erase(const_iterator position){
-        if((position->loc) == nullptr){
-
-        }
     }
 
     unsigned int erase(const key_type& k);
 
     void clear();
 
-    mapped_type &operator[](const K &key);
+    mapped_type &operator[](const K &key){
+        return (*find(key)).second;
+    }
 
     bool operator==(const BSTMap<K,V>& rhs) const;
 
