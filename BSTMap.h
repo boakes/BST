@@ -123,7 +123,7 @@ public:
 
     unsigned size() const {return sz;}
 
-    Node* fancy_find(Node* nd, const key_type& k){
+    Node* fancy_find(Node* nd, const key_type& k) const{
         if(nd == nullptr || k == nd->key){
             return nd;
         }if(k < nd->key){
@@ -177,7 +177,16 @@ public:
         }
     }
 
-    void transplant(){}
+    void transplant(Node* u, Node* v){
+        if(u->parent == nullptr){
+            root = v;
+        } else if (u == u->parent->left){
+            u->parent->left = v;
+        } else u->parent->right = v;
+        if (v != nullptr){
+            v->parent = u->parent;
+        }
+    }
 
     iterator erase(const_iterator position);
 

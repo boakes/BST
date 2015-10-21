@@ -55,7 +55,7 @@ void runTests(){
 	for(int i=0; i<test_size; ++i){
 		cout << "\n" << i;
 		if(shark[randoms[i]]!=dolphin[randoms[i]]){
-			//cout << "insert failure: shark " << shark[randoms[i]] << " should be dolphin " << dolphin[randoms[i]] << "\n";
+			cout << "insert failure: shark " << shark[randoms[i]] << " should be dolphin " << dolphin[randoms[i]] << "\n";
 		}
 	}	
 	
