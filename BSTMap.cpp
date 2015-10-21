@@ -41,19 +41,12 @@ void runTests(){
     random_shuffle(randoms.begin(), randoms.end());
 	//cout << randoms[0] << "\n";
 	for(int i=0; i<test_size; ++i){
-		cout << "inserting " << i << "\n";
 	    shark.insert(make_pair(randoms[i],randoms[i]));
-		cout << "after insert of BST MAP "<< i << "\n";
 		dolphin.insert(make_pair(randoms[i],randoms[i]));
-		cout << "after insert of MAP "<< i << "\n";
 	}
-
-	cout << "After loop\n";
 	
 	random_shuffle(randoms.begin(), randoms.end()--);
-	cout << "after shuffle\n";
 	for(int i=0; i<test_size; ++i){
-		cout << "\n" << i;
 		if(shark[randoms[i]]!=dolphin[randoms[i]]){
 			cout << "insert failure: shark " << shark[randoms[i]] << " should be dolphin " << dolphin[randoms[i]] << "\n";
 		}
@@ -71,9 +64,11 @@ void runTests(){
 	*/
 	cout << "\n--TESTS COMPLETE--------------------------------------------------\n";
 
+	//cout << dolphin[(shark.minNode(shark.root))->nodepr.first];
+	//cout << shark[(shark.minNode(shark.root))->nodepr.first];
 }
 int main(){
-	testone();
+	//testone();
 	runTests();
 	return 0; 	
 }
