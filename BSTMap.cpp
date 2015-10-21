@@ -37,7 +37,7 @@ void testone() {
 }
 
 void runTests(){
-	int test_size = 10000;
+	int test_size = 100;
     BSTMap<int, int> firstbst;
 	map<int,int> firstmap;
 	

@@ -23,7 +23,7 @@ private:
         }
     };
     // TODO: specify whatever member data you need.
-    unsigned sz; 
+    int sz; 
     Node* root;
     
 public:
@@ -54,21 +54,38 @@ public:
             return y;
         }
 
+        Node* Predecessor(Node* x){
+         if (x->left != nullptr){
+            return BSTMap<K,V>::maxNode(x->left);
+         } 
+          Node* y = x->parent;
+          while (y != nullptr && x == y->left){
+                x = y;
+                y = y->parent;
+            }
+            return y;
+        }
+
         bool operator==(const iterator &i) const { 
-            return (loc->nodepr == i.loc->nodepr && itrend == i.itrend); 
+            return (loc == i.loc && itrend == i.itrend); 
         }
 
         bool operator!=(const iterator &i) const { return !(*this==i); }
         std::pair<K,V> &operator*() { return loc -> nodepr; }
         iterator &operator++() {
-            loc = Successor(loc);
-            if(loc == nullptr){
+            if(Successor(loc) == nullptr){
                 itrend = true;
+            }else{
+                loc = Successor(loc);
             }
             return *this;
         }
         iterator &operator--() {
-            // TODO
+            if(itrend){
+                itrend = false;
+            }else{
+                loc = Predecessor(loc);
+            }
             return *this;
         }
         iterator operator++(int) {
@@ -105,19 +122,35 @@ public:
             return y;
         }
 
+        Node* Predecessor(Node* x){
+         if (x->left != nullptr){
+            return BSTMap<K,V>::maxNode(x->left);
+         } 
+          Node* y = x->parent;
+          while (y != nullptr && x == y->left){
+                x = y;
+                y = y->parent;
+            }
+            return y;
+        }
 
         bool operator==(const const_iterator &i) const { /*TODO*/ }
         bool operator!=(const const_iterator &i) const { return !(*this==i); }
-        const std::pair<K,V> &operator*() { /*TODO*/ }
+        const std::pair<K,V> &operator*() { return loc -> nodepr; }
         const_iterator &operator++() {
-            loc = Successor(loc);
-            if(loc == nullptr){
+            if(Successor(loc) == nullptr){
                 itrend = true;
+            }else{
+                loc = Successor(loc);
             }
             return *this;
         }
         const_iterator &operator--() {
-            // TODO
+            if(itrend){
+                itrend = false;
+            }else{
+                loc = Predecessor(loc);
+            }
             return *this;
         }
         const_iterator operator++(int) {
@@ -149,12 +182,11 @@ public:
        sz = 0; 
     }
     ~BSTMap(){
-
+       clear();
     }
-    BSTMap(const BSTMap<K,V> &that) {
+    BSTMap(const BSTMap<K,V> &that){
         // TODO
     }
-
     BSTMap &operator=(const BSTMap<K,V> &that) {
         // TODO
     }
@@ -181,14 +213,18 @@ public:
         auto fndr = fancy_find(root,k);
         if(fndr == nullptr){
             return end();
-        }
-        else {
-            return iterator(fancy_find(root,k),false);
+        }else {
+            return iterator(fndr,false);
         }
     }
 
     const_iterator find(const key_type& k) const{
-        return const_iterator(fancy_find(root,k),false);
+        auto fndr = fancy_find(root,k);
+        if(fndr == nullptr){
+            return cend();
+        }else {
+            return iterator(fndr,false);
+        }
     }
 
     unsigned int count(const key_type& k) const{
@@ -204,17 +240,15 @@ public:
         if(count(val.first) == 1){
             return std::make_pair(find(val.first),false);
         }
-
         Node* z = new Node(nullptr,nullptr,nullptr,val.first,val.second);
         Node* y = nullptr;
         Node* x = root;
-        
         ++sz;
         while (x != nullptr){
             y = x;
             if(z->nodepr.first < x->nodepr.first){
                 x = x->left;
-            } else {x = x->right;}
+            }else{x = x->right;}
         }
         z->parent = y;
         if(y == nullptr){
@@ -248,8 +282,9 @@ public:
     }
 
     iterator erase(const_iterator position){
-        auto z = position.loc;
-        if(z == nullptr){
+        Node* z = position.loc;
+        Node* tmp = z; 
+        if(z->left == nullptr){
             transplant(z,z->right);
         } else if(z->right == nullptr){
             transplant(z,z->left);
@@ -270,34 +305,41 @@ public:
         if(count(k) == 0){
             return 0;
         }else{
-        std::cout << "\nbefore find\n";
-        auto z = fancy_find(root,k);
-        std::cout << "after find\n";
-        if(z == nullptr){
-            transplant(z,z->right);
-        }else if(z->right == nullptr){
-            std::cout << "z's right\n";
-            transplant(z,z->left);
-            std::cout << "transplant happened";
-        }else {
-            std::cout << "z's left\n";
-            Node* y = minNode(z->right);
-            std::cout << "y created I guess\n";
-            if(y->parent != z){
-                std::cout << "before transplant\n";
-                transplant(y,y->right);
-                std::cout << "after transplant\n";
-                y->right = z->right;
-                y->right->parent = y;
+         Node* z = fancy_find(root,k);
+         Node* tmp = z; 
+            if(z->left == nullptr){
+                std::cout << tmp->nodepr.first << " " << z->nodepr.first << "\n";
+                transplant(z,z->right);
+                std::cout << tmp->nodepr.first << " " << z->nodepr.first << "\n";
+                delete tmp;
+            }else if(z->right == nullptr){
+                std::cout << tmp->nodepr.first << " " << z->nodepr.first << "\n";
+                transplant(z,z->left);
+                std::cout << tmp->nodepr.first << " " << z->nodepr.first << "\n";
+                delete tmp;
+            }else { 
+                Node* y = minNode(z->right);
+                if(y->parent != z){
+                  transplant(y,y->right);
+                  y->right = z->right;
+                  y->right->parent = y;
+                }
+                
+                transplant(z,y);
+                
+                y->left = z->left;
+                y->left->parent = y;
             }
-            transplant(z,y);
-            y->left = z->left;
-            y->left->parent = y;
         }
-        }
+        --sz;
+        return 1;
     }
 
-    void clear();
+    void clear(){
+        while(sz!=0){
+            erase(root->nodepr.first);
+        }
+    }
 
     mapped_type &operator[](const K &key){
         return (*find(key)).second;
@@ -320,6 +362,12 @@ public:
     const_iterator cbegin() const { return const_iterator(minNode(root),false); }
 
     const_iterator cend() const { return const_iterator(maxNode(root),true); }
+
+    void inorderTree(Node* x){
+        inorderTree(x->left);
+        std::cout << x->nodepr.first << "\n";
+        inorderTree(x->right);
+    }
 
 };
 
