@@ -1,6 +1,8 @@
 #ifndef BSTMAP
 #define BSTMAP 
+
 #include <iostream> 
+#include <functional>
 
 template<typename K,typename V>
 class BSTMap {
@@ -13,6 +15,7 @@ private:
         Node* parent; 
         K key;
         V data;
+        std::pair<K,V> nodepr; 
 
         Node(Node* r, Node* l, Node* p, K k, V v){
             right = r;
@@ -20,13 +23,13 @@ private:
             parent = p; 
             key = k;
             data = v; 
-
+            nodepr = std::make_pair(key,data);
         }
     };
 
     // TODO: specify whatever member data you need.
     Node* root;
-    int sz; 
+    unsigned int sz; 
 
 public:
     typedef K key_type;
@@ -37,16 +40,16 @@ public:
 
     class iterator {
         // TODO: Iterator data. I keep a Node* and a bool that tells me if it is at end.
-        Node* itrnode; 
-        bool itrend = false;
+        Node* loc; 
+        bool itrend;
     public:
         friend class const_iterator;
-        iterator(/*TODO*/)/*:...*/ { /*TODO*/ }
+        iterator(Node* l,bool b):loc(l),itrend(b){}
         // TODO: Other constructors as needed.
 
         bool operator==(const iterator &i) const { /*TODO*/ }
         bool operator!=(const iterator &i) const { return !(*this==i); }
-        std::pair<K,V> &operator*() { /*TODO*/ }
+        std::pair<K,V> &operator*() { return loc -> nodepr; }
         iterator &operator++() {
             // TODO
             return *this;
@@ -68,12 +71,13 @@ public:
     };
 
     class const_iterator {
-        // TODO: iterator data
+        Node* loc; 
+        bool itrend;
     public:
         friend class BSTMap<K,V>;  // You might not need this in your code, but it helped me.
         const_iterator(/*TODO*/)/*:...*/ { /*TODO*/ }
         // TODO: Other constructors as needed.
-        const_iterator(const iterator &iter)/*:...*/ {}
+        const_iterator(const iterator &iter):loc(iter.loc),itrend(iter.itrend){}
 
         bool operator==(const const_iterator &i) const { /*TODO*/ }
         bool operator!=(const const_iterator &i) const { /*TODO*/ }
@@ -105,7 +109,7 @@ public:
        sz = 0; 
     }
     ~BSTMap() {
-        // TODO
+
     }
     BSTMap(const BSTMap<K,V> &that) {
         // TODO
@@ -115,9 +119,20 @@ public:
         // TODO
     }
 
-    bool empty() const { /*TODO*/ }
+    bool empty() const {return sz == 0;}
 
-    unsigned size() const { /*TODO*/ }
+    unsigned size() const {return sz;}
+
+    Node* search(Node* nd, const key_type& k){
+        if(nd == nullptr || k == nd->key){
+            return nd;
+        }
+        if(k < nd->key){
+            return search(nd->left,k);
+        } else {
+            return search(nd->right,k);
+        }
+    }
 
     iterator find(const key_type& k);
 
@@ -153,7 +168,13 @@ public:
         }
     }
 
-    iterator erase(const_iterator position);
+    void transplant(){}
+
+    iterator erase(const_iterator position){
+        if((position->loc) == nullptr){
+
+        }
+    }
 
     unsigned int erase(const key_type& k);
 
@@ -163,7 +184,9 @@ public:
 
     bool operator==(const BSTMap<K,V>& rhs) const;
 
-    bool operator!=(const BSTMap<K,V>& rhs) const;
+    bool operator!=(const BSTMap<K,V>& rhs) const{
+       return !(this == rhs);
+    }
 
     iterator begin() { return iterator(/*TODO*/); }
 
