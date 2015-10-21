@@ -30,6 +30,10 @@ void testone() {
 	cout << test.count(0) << "\n";
 	cout << "This should be a 1: " << (itrfrst.first == itrfrstfail.first);
 	cout << "\nThis should be a 0: " << (itrfrst.second == itrfrstfail.second);
+	
+	test.erase(2);
+	cout << "\n"<< test.count(2) << "\n";
+	
 }
 
 void runTests(){

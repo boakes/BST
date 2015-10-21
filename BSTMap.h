@@ -42,7 +42,6 @@ public:
         friend class const_iterator;
         iterator(Node* l,bool b):loc(l),itrend(b){}
         // TODO: Other constructors as needed.
-
         Node* Successor(Node* x){
          if (x->right != nullptr){
             return BSTMap<K,V>::minNode(x->right);
@@ -53,15 +52,19 @@ public:
                 y = y->parent;
             }
             return y;
-         }
+        }
 
         bool operator==(const iterator &i) const { 
             return (loc->nodepr == i.loc->nodepr && itrend == i.itrend); 
-         }
+        }
+
         bool operator!=(const iterator &i) const { return !(*this==i); }
         std::pair<K,V> &operator*() { return loc -> nodepr; }
         iterator &operator++() {
-            // TODO
+            loc = Successor(loc);
+            if(loc == nullptr){
+                itrend = true;
+            }
             return *this;
         }
         iterator &operator--() {
@@ -89,11 +92,28 @@ public:
         // TODO: Other constructors as needed.
         const_iterator(const iterator &iter):loc(iter.loc),itrend(iter.itrend){}
 
+
+        Node* Successor(Node* x){
+         if (x->right != nullptr){
+            return BSTMap<K,V>::minNode(x->right);
+         } 
+          Node* y = x->parent;
+          while (y != nullptr && x == y->right){
+                x = y;
+                y = y->parent;
+            }
+            return y;
+        }
+
+
         bool operator==(const const_iterator &i) const { /*TODO*/ }
         bool operator!=(const const_iterator &i) const { return !(*this==i); }
         const std::pair<K,V> &operator*() { /*TODO*/ }
         const_iterator &operator++() {
-            // TODO
+            loc = Successor(loc);
+            if(loc == nullptr){
+                itrend = true;
+            }
             return *this;
         }
         const_iterator &operator--() {
@@ -227,9 +247,55 @@ public:
         }
     }
 
-    iterator erase(const_iterator position);
+    iterator erase(const_iterator position){
+        auto z = position.loc;
+        if(z == nullptr){
+            transplant(z,z->right);
+        } else if(z->right == nullptr){
+            transplant(z,z->left);
+        } else {
+            auto y = minNode(z->right);
+            if(y->parent != z){
+                transplant(y,y->right);
+                y->right = z->right;
+                y->right->parent = y;
+            }
+            transplant(z,y);
+            y->left = z->left;
+            y->left->parent = y;
+        }
+    }
 
-    unsigned int erase(const key_type& k);
+    unsigned int erase(const key_type& k){
+        if(count(k) == 0){
+            return 0;
+        }else{
+        std::cout << "\nbefore find\n";
+        auto z = fancy_find(root,k);
+        std::cout << "after find\n";
+        if(z == nullptr){
+            transplant(z,z->right);
+        }else if(z->right == nullptr){
+            std::cout << "z's right\n";
+            transplant(z,z->left);
+            std::cout << "transplant happened";
+        }else {
+            std::cout << "z's left\n";
+            Node* y = minNode(z->right);
+            std::cout << "y created I guess\n";
+            if(y->parent != z){
+                std::cout << "before transplant\n";
+                transplant(y,y->right);
+                std::cout << "after transplant\n";
+                y->right = z->right;
+                y->right->parent = y;
+            }
+            transplant(z,y);
+            y->left = z->left;
+            y->left->parent = y;
+        }
+        }
+    }
 
     void clear();
 
