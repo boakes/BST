@@ -1,21 +1,32 @@
 #ifndef BSTMAP
 #define BSTMAP 
-
+#include <iostream> 
 
 template<typename K,typename V>
 class BSTMap {
+    
+private:
     // TODO: Define your Node
-
     struct Node{
         Node* right;
         Node* left; 
         Node* parent; 
-        K key_data;
-        V mapped_data;
+        K key;
+        V data;
+
+        Node(Node* r, Node* l, Node* p, K k, V v){
+            right = r;
+            left = l;
+            parent = p; 
+            key = k;
+            data = v; 
+
+        }
     };
 
     // TODO: specify whatever member data you need.
-    Node root;
+    Node* root;
+    int sz; 
 
 public:
     typedef K key_type;
@@ -27,7 +38,7 @@ public:
     class iterator {
         // TODO: Iterator data. I keep a Node* and a bool that tells me if it is at end.
         Node* itrnode; 
-        bool itrend;
+        bool itrend = false;
     public:
         friend class const_iterator;
         iterator(/*TODO*/)/*:...*/ { /*TODO*/ }
@@ -90,7 +101,8 @@ public:
 
 
     BSTMap() {
-        // TODO
+       root = nullptr;
+       sz = 0; 
     }
     ~BSTMap() {
         // TODO
@@ -114,16 +126,24 @@ public:
     unsigned int count(const key_type& k) const;
 
     std::pair<iterator,bool> insert(const value_type& val){
-        //should have better way to initialize root
-        /*
-        if(root != NULL){
-            root = new Node(); 
-            root.key_data = val.first; 
-            root.mapped_data = val.second; 
-        }else {
-            auto x = root; 
-            auto y = NULL; 
-        } */
+        Node* y = nullptr;
+        auto x = root;
+        auto z = new Node(nullptr,nullptr,nullptr,val.first,val.second);
+        while (x != nullptr){
+            y = x;
+            if(val.first != x->key){
+                x = x->left;
+            } else {x = x->right;}
+        }
+        z->parent = y;
+        if(y == nullptr){
+            root = z;
+        } else if(val.first < y->key){
+            y->left = z;
+        } else{
+            y->right = z;
+        }
+
     }
 
     template <class InputIterator>
