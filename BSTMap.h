@@ -2,7 +2,7 @@
 #define BSTMAP 
 
 #include <iostream> 
-#include <functional>
+#include <stdlib.h>
 
 template<typename K,typename V>
 class BSTMap {
@@ -29,7 +29,7 @@ private:
 
     // TODO: specify whatever member data you need.
     Node* root;
-    unsigned int sz; 
+    unsigned sz; 
 
 public:
     typedef K key_type;
@@ -123,47 +123,50 @@ public:
 
     unsigned size() const {return sz;}
 
-    Node* search(Node* nd, const key_type& k){
+    Node* fancy_find(Node* nd, const key_type& k){
         if(nd == nullptr || k == nd->key){
             return nd;
-        }
-        if(k < nd->key){
-            return search(nd->left,k);
+        }if(k < nd->key){
+            return fancy_find(nd->left,k);
         } else {
-            return search(nd->right,k);
+            return fancy_find(nd->right,k);
         }
     }
 
     iterator find(const key_type& k){
-        return iterator(search(root,k),false);
+        return iterator(fancy_find(root,k),false);
     }
 
     const_iterator find(const key_type& k) const{
-        return const_iterator(search(root,k),false);
+        return const_iterator(fancy_find(root,k),false);
     }
 
-    unsigned int count(const key_type& k) const;
+    unsigned int count(const key_type& k) const{
+
+    }
 
     std::pair<iterator,bool> insert(const value_type& val){
+        Node* z = new Node(nullptr,nullptr,nullptr,val.first,val.second);
         Node* y = nullptr;
         Node* x = root;
-        Node* z = new Node(nullptr,nullptr,nullptr,val.first,val.second);
+        ++sz;
+
         while (x != nullptr){
             y = x;
-            if(val.first != x->key){
+            if(z->key < x->key){
                 x = x->left;
             } else {x = x->right;}
         }
         z->parent = y;
         if(y == nullptr){
             root = z;
-        } else if(val.first < y->key){
+        } else if(z->key < y->key){
             y->left = z;
         } else{
             y->right = z;
         }
-        
-        return std::make_pair<iterator,bool> (iterator(z,false),true);
+
+        return std::make_pair(iterator(z,false),true);
 
     }
 
@@ -176,8 +179,7 @@ public:
 
     void transplant(){}
 
-    iterator erase(const_iterator position){
-    }
+    iterator erase(const_iterator position);
 
     unsigned int erase(const key_type& k);
 
