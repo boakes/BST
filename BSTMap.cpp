@@ -19,19 +19,23 @@ void testone() {
 	snd = make_pair(2,2);
 	pair<int,int> thrd;
 	thrd = make_pair(3,3);
-	test.insert(fst);
-	cout << test[1];
+	auto itrfrst = test.insert(fst);
+	auto itrfrstfail = test.insert(fst);
+	cout << test[1] << "\n";
 	test.insert(snd);
-	cout << test[2];
+	cout << test[2] << "\n";
 	test.insert(thrd);
-	cout << test[3];
+	cout << test[3] << "\n";
+	cout << test.count(1) << "\n";
+	cout << test.count(0) << "\n";
+	cout << "This should be a 1: " << (itrfrst.first == itrfrstfail.first);
+	cout << "\nThis should be a 0: " << (itrfrst.second == itrfrstfail.second);
 }
 
 void runTests(){
-	int test_size = 10;
-	cout << "\n--BSTMAP<INT,INT> TESTS BEGIN-------------------------------------\n\n";
-    BSTMap<int, int> shark;
-	map<int,int> dolphin;
+	int test_size = 10000;
+    BSTMap<int, int> firstbst;
+	map<int,int> firstmap;
 	
 	vector<int> randoms;
 	for(int i = 0; i<test_size; ++i){
@@ -41,35 +45,45 @@ void runTests(){
     random_shuffle(randoms.begin(), randoms.end());
 	//cout << randoms[0] << "\n";
 	for(int i=0; i<test_size; ++i){
-	    shark.insert(make_pair(randoms[i],randoms[i]));
-		dolphin.insert(make_pair(randoms[i],randoms[i]));
+	    firstbst.insert(make_pair(randoms[i],randoms[i]));
+		firstmap.insert(make_pair(randoms[i],randoms[i]));
 	}
 	
 	random_shuffle(randoms.begin(), randoms.end()--);
 	for(int i=0; i<test_size; ++i){
-		if(shark[randoms[i]]!=dolphin[randoms[i]]){
-			cout << "insert failure: shark " << shark[randoms[i]] << " should be dolphin " << dolphin[randoms[i]] << "\n";
+		if(firstbst[randoms[i]]!=firstmap[randoms[i]]){
+			cout << "insert failure: firstbst " << firstbst[randoms[i]] << " should be firstmap " << firstmap[randoms[i]] << "\n";
 		}
 	}	
 	
 	/*
-	//shark.callInOrd();
+	//firstbst.callInOrd();
 	random_shuffle(randoms.begin(), randoms.end());
 	for(int i = 0; i<test_size; ++i){
 		//cout << "randoms " << randoms[i] << "\n";
-		//shark.erase(randoms[i]);		
+		//firstbst.erase(randoms[i]);		
 	}
-	//shark.erase(0);
+	//firstbst.erase(0);
 	
 	*/
-	cout << "\n--TESTS COMPLETE--------------------------------------------------\n";
 
-	//cout << dolphin[(shark.minNode(shark.root))->nodepr.first];
-	//cout << shark[(shark.minNode(shark.root))->nodepr.first];
+
+	cout << firstmap[(firstbst.maxNode(firstbst.getroot()))->nodepr.first];
+	cout << " ";
+	cout << firstbst[(firstbst.maxNode(firstbst.getroot()))->nodepr.first];
+	cout << "\n";
+	cout << firstmap[(firstbst.minNode(firstbst.getroot()))->nodepr.first];
+	cout << " ";
+	cout << firstbst[(firstbst.minNode(firstbst.getroot()))->nodepr.first];
+	cout << "\n";
+	
 }
 int main(){
-	//testone();
+	testone();
+	cout << "\n Testone passed\n";
 	runTests();
+	cout << "\n RunTests passed\n";
+
 	return 0; 	
 }
 

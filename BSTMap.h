@@ -22,9 +22,7 @@ private:
             nodepr = std::make_pair(k,v);
         }
     };
-
     // TODO: specify whatever member data you need.
-    
     unsigned sz; 
     Node* root;
     
@@ -45,7 +43,21 @@ public:
         iterator(Node* l,bool b):loc(l),itrend(b){}
         // TODO: Other constructors as needed.
 
-        bool operator==(const iterator &i) const { /*TODO*/ }
+        Node* Successor(Node* x){
+         if (x->right != nullptr){
+            return BSTMap<K,V>::minNode(x->right);
+         } 
+          Node* y = x->parent;
+          while (y != nullptr && x == y->right){
+                x = y;
+                y = y->parent;
+            }
+            return y;
+         }
+
+        bool operator==(const iterator &i) const { 
+            return (loc->nodepr == i.loc->nodepr && itrend == i.itrend); 
+         }
         bool operator!=(const iterator &i) const { return !(*this==i); }
         std::pair<K,V> &operator*() { return loc -> nodepr; }
         iterator &operator++() {
@@ -78,7 +90,7 @@ public:
         const_iterator(const iterator &iter):loc(iter.loc),itrend(iter.itrend){}
 
         bool operator==(const const_iterator &i) const { /*TODO*/ }
-        bool operator!=(const const_iterator &i) const { /*TODO*/ }
+        bool operator!=(const const_iterator &i) const { return !(*this==i); }
         const std::pair<K,V> &operator*() { /*TODO*/ }
         const_iterator &operator++() {
             // TODO
@@ -100,25 +112,13 @@ public:
         }
     };
 
-    Node* succNode(Node* x){
-        if (x->right != nullptr){
-            return minNode(x->right);
-        } 
-        Node* y = x->parent;
-        while (y != nullptr && x == y->right){
-            x = y;
-            y = y->parent;
-        }
-        return y;
-    }
-
-    Node* maxNode(Node* x){
+    static Node* maxNode(Node* x){
         while (x->right != nullptr){
-            x == x->right;
+            x = x->right;
         } return x;
     }
 
-    Node* minNode(Node* x){
+    static Node* minNode(Node* x){
         while (x->left != nullptr){
             x = x->left;
         } return x;
@@ -143,32 +143,53 @@ public:
 
     unsigned size() const {return sz;}
 
+    Node* getroot(){
+        return root;
+    }
+
     Node* fancy_find(Node* nd, const key_type& k) const{
         if(nd == nullptr || k == nd->nodepr.first){
             return nd;
         }if(k < nd->nodepr.first){
             return fancy_find(nd->left,k);
-        } else {
+        } else if (k > nd->nodepr.first){
             return fancy_find(nd->right,k);
         }
     }
 
     iterator find(const key_type& k){
-        return iterator(fancy_find(root,k),false);
+        auto fndr = fancy_find(root,k);
+        if(fndr == nullptr){
+            return end();
+        }
+        else {
+            return iterator(fancy_find(root,k),false);
+        }
     }
 
     const_iterator find(const key_type& k) const{
         return const_iterator(fancy_find(root,k),false);
     }
 
-    unsigned int count(const key_type& k) const;
+    unsigned int count(const key_type& k) const{
+        auto fndr = fancy_find(root,k);
+        if(fndr == nullptr){
+            return 0;
+        } else {
+            return 1;
+        }
+    }
 
     std::pair<iterator,bool> insert(const value_type& val){
+        if(count(val.first) == 1){
+            return std::make_pair(find(val.first),false);
+        }
+
         Node* z = new Node(nullptr,nullptr,nullptr,val.first,val.second);
         Node* y = nullptr;
         Node* x = root;
+        
         ++sz;
-
         while (x != nullptr){
             y = x;
             if(z->nodepr.first < x->nodepr.first){
@@ -222,7 +243,7 @@ public:
        return !(this == rhs);
     }
 
-    iterator begin() { return iterator(minNode(root),false); }
+    iterator begin() {return iterator(minNode(root),false);}
 
     const_iterator begin() const { return const_iterator(minNode(root),false); }
 
