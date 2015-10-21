@@ -1,7 +1,7 @@
 #!/bin/sh
 cd "$(dirname "$0")"
 
-now=$(date +"%T")
+now=$(date +"%D %T")
 
 cp ~/Desktop/DataAbstraction/BST\ Map/BSTMap.cpp ~/Desktop/DataAbRepo/BST/
 cp ~/Desktop/DataAbstraction/BST\ Map/BSTMap.h ~/Desktop/DataAbRepo/BST/
