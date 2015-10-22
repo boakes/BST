@@ -33,6 +33,14 @@ void testone() {
 	
 	test.erase(2);
 	cout << "\n"<< test.count(2) << "\n";
+
+
+	for(auto x:test){
+		cout << "\n" << "Ranged loop";
+		cout << x.first << "\n";
+	}
+
+
 	
 }
 
@@ -60,6 +68,9 @@ void runTests(){
 		}
 	}	
 	
+	BSTMap<int, int> tsbtsrif(firstbst);
+	
+
 	/*
 	//firstbst.callInOrd();
 	random_shuffle(randoms.begin(), randoms.end());
@@ -82,12 +93,45 @@ void runTests(){
 	cout << "\n";
 	
 }
+
+bool equalitytest(){
+	int test_size = 1000;
+	bool testbool = true;
+	BSTMap<int,int> test;
+	map<int,int> testmap;
+	vector<int> RandomThing;
+	for(int i = 0; i<test_size; ++i){
+		RandomThing.push_back(i);
+	}
+    random_shuffle(RandomThing.begin(), RandomThing.end());
+
+    for(int i=0;i<test_size;++i){
+    	test.insert(make_pair(RandomThing[i],RandomThing[i]));
+    	testmap.insert(make_pair(RandomThing[i],RandomThing[i]));
+    }
+
+    auto ths = test.begin()++++++++++++;
+    auto thsafter = ths;
+    thsafter++;
+    auto ers = test.erase(ths);
+    if(ers != thsafter){
+    	testbool = false;
+    }
+	for(auto bgn = test.begin();bgn != test.end(); ++bgn){
+		if((*bgn).second != testmap[(*bgn).first]){
+			testbool = false;
+		}	
+	}
+
+	return testbool;
+}
 int main(){
 	testone();
-	cout << "\n Testone passed\n";
+	cout << "\n---------Testone passed---------\n";
 	runTests();
-	cout << "\n RunTests passed\n";
-
+	cout << "\n---------RunTests passed---------\n";
+	if(equalitytest()) {cout << "\n---------Equality Test Passed---------\n";}
+	else cout << "\n---------Equality Test Failed---------\n";
 	return 0; 	
 }
 

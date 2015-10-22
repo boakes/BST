@@ -8,7 +8,7 @@ template<typename K,typename V>
 class BSTMap {
     
 private:
-    // TODO: Define your Node
+
     struct Node{
         Node* right;
         Node* left; 
@@ -22,7 +22,7 @@ private:
             nodepr = std::make_pair(k,v);
         }
     };
-    // TODO: specify whatever member data you need.
+
     int sz; 
     Node* root;
     
@@ -40,7 +40,11 @@ public:
         bool itrend;
     public:
         friend class const_iterator;
-        iterator(Node* l,bool b):loc(l),itrend(b){}
+        iterator(Node* l,bool b):loc(l),itrend(b){
+            if (loc == nullptr){
+                itrend = true;
+            }
+        }
         // TODO: Other constructors as needed.
         Node* Successor(Node* x){
          if (x->right != nullptr){
@@ -105,7 +109,11 @@ public:
         bool itrend;
     public:
         friend class BSTMap<K,V>;  // You might not need this in your code, but it helped me.
-        const_iterator(/*TODO*/)/*:...*/ { /*TODO*/ }
+        const_iterator(Node* l,bool b):loc(l),itrend(b) {
+            if (loc == nullptr){
+                itrend = true;
+            }
+        }
         // TODO: Other constructors as needed.
         const_iterator(const iterator &iter):loc(iter.loc),itrend(iter.itrend){}
 
@@ -134,7 +142,7 @@ public:
             return y;
         }
 
-        bool operator==(const const_iterator &i) const { /*TODO*/ }
+        bool operator==(const const_iterator &i) const { return (loc == i.loc && itrend == i.itrend);  }
         bool operator!=(const const_iterator &i) const { return !(*this==i); }
         const std::pair<K,V> &operator*() { return loc -> nodepr; }
         const_iterator &operator++() {
@@ -185,7 +193,11 @@ public:
        clear();
     }
     BSTMap(const BSTMap<K,V> &that){
-        // TODO
+        root = nullptr; 
+        sz = 0; 
+        for(auto x=that.begin();x!=that.end();++x){
+            insert(*x);
+        }
     }
     BSTMap &operator=(const BSTMap<K,V> &that) {
         // TODO
@@ -206,7 +218,7 @@ public:
             return fancy_find(nd->left,k);
         } else if (k > nd->nodepr.first){
             return fancy_find(nd->right,k);
-        }
+        } 
     }
 
     iterator find(const key_type& k){
@@ -281,25 +293,7 @@ public:
         }
     }
 
-    iterator erase(const_iterator position){
-        Node* z = position.loc;
-        Node* tmp = z; 
-        if(z->left == nullptr){
-            transplant(z,z->right);
-        } else if(z->right == nullptr){
-            transplant(z,z->left);
-        } else {
-            auto y = minNode(z->right);
-            if(y->parent != z){
-                transplant(y,y->right);
-                y->right = z->right;
-                y->right->parent = y;
-            }
-            transplant(z,y);
-            y->left = z->left;
-            y->left->parent = y;
-        }
-    }
+    
 
     unsigned int erase(const key_type& k){
         if(count(k) == 0){
@@ -308,15 +302,10 @@ public:
          Node* z = fancy_find(root,k);
          Node* tmp = z; 
             if(z->left == nullptr){
-                std::cout << tmp->nodepr.first << " " << z->nodepr.first << "\n";
                 transplant(z,z->right);
-                std::cout << tmp->nodepr.first << " " << z->nodepr.first << "\n";
-                delete tmp;
             }else if(z->right == nullptr){
-                std::cout << tmp->nodepr.first << " " << z->nodepr.first << "\n";
                 transplant(z,z->left);
-                std::cout << tmp->nodepr.first << " " << z->nodepr.first << "\n";
-                delete tmp;
+
             }else { 
                 Node* y = minNode(z->right);
                 if(y->parent != z){
@@ -324,15 +313,22 @@ public:
                   y->right = z->right;
                   y->right->parent = y;
                 }
-                
                 transplant(z,y);
-                
                 y->left = z->left;
                 y->left->parent = y;
             }
+            delete tmp;
+            --sz;
+            return 1;
         }
-        --sz;
-        return 1;
+       
+    }
+
+    iterator erase(const_iterator position){
+        auto tmp = find((*position).first);
+        ++tmp; 
+        erase((*position).first);
+        return tmp;
     }
 
     void clear(){
@@ -345,7 +341,19 @@ public:
         return (*find(key)).second;
     }
 
-    bool operator==(const BSTMap<K,V>& rhs) const;
+    bool operator==(const BSTMap<K,V>& rhs) const{
+       if(sz != rhs.sz){
+        return false;
+       }
+       auto rightitr = rhs.begin();
+       for(auto strt = begin(); strt != end(); ++strt){
+          if(strt != rightitr){
+            return false;
+          }
+          ++rightitr;
+       }
+       return true;
+    }
 
     bool operator!=(const BSTMap<K,V>& rhs) const{
        return !(this == rhs);
