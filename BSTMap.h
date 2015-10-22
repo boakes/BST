@@ -3,12 +3,10 @@
 
 #include <iostream> 
 #include <stdlib.h>
-#include <vector> 
 template<typename K,typename V>
 class BSTMap {
     
 private:
-
     struct Node{
         Node* right;
         Node* left; 
@@ -22,7 +20,6 @@ private:
             nodepr = std::make_pair(k,v);
         }
     };
-
     int sz; 
     Node* root;
     
@@ -35,7 +32,6 @@ public:
     class const_iterator;
 
     class iterator {
-
         Node* loc; 
         bool itrend;
     public:
@@ -73,20 +69,23 @@ public:
         bool operator!=(const iterator &i) const { return !(*this==i); }
         std::pair<K,V> &operator*() { return loc -> nodepr; }
         iterator &operator++() {
-            if(Successor(loc) == nullptr){
+            Node* tmp = Successor(loc);
+            if(tmp == nullptr){
                 itrend = true;
             }else{
-                loc = Successor(loc);
+                loc = tmp;
+                itrend =false;
             }
             return *this;
         }
         iterator &operator--() {
             if(itrend){
                 itrend = false;
+                return *this;
             }else{
                 loc = Predecessor(loc);
+                return *this;
             }
-            return *this;
         }
         iterator operator++(int) {
             iterator tmp(*this);
@@ -137,10 +136,12 @@ public:
         bool operator!=(const const_iterator &i) const { return !(*this==i); }
         const std::pair<K,V> &operator*() { return loc -> nodepr; }
         const_iterator &operator++() {
-            if(Successor(loc) == nullptr){
+            Node* tmp = Successor(loc);
+            if(tmp == nullptr){
                 itrend = true;
             }else{
-                loc = Successor(loc);
+                loc = tmp;
+                itrend=false;
             }
             return *this;
         }
@@ -183,6 +184,16 @@ public:
     ~BSTMap(){
        clear();
     }
+
+    void helpCopier(Node *x){
+        if(x!=nullptr){
+            insert(x->nodepr);
+            helpCopier(x->left);
+            helpCopier(x->right);
+        }
+    }
+
+
     BSTMap(const BSTMap<K,V> &that){
         root = nullptr; 
         sz = 0; 
@@ -194,9 +205,8 @@ public:
         clear();
         root = nullptr;
         sz = 0; 
-        for(auto x=that.begin();x!=that.end();++x){
-            insert(*x);
-        }
+        helpCopier(that.root);
+        return *this;
     }
 
     bool empty() const {return sz == 0;}
@@ -299,7 +309,6 @@ public:
                 transplant(z,z->right);
             }else if(z->right == nullptr){
                 transplant(z,z->left);
-
             }else { 
                 Node* y = minNode(z->right);
                 if(y->parent != z){
@@ -336,8 +345,9 @@ public:
         if(count(key) == 1){
             return (*find(key)).second;
         }else{
-            mapped_type output;
-            insert(std::make_pair(key,output)); 
+            std::pair<K,V> jk;
+            jk.first = key;
+            insert(jk); 
             return (*find(key)).second;
         }
     }
@@ -346,18 +356,12 @@ public:
        if(sz != rhs.sz){
         return false;
        }
-       std::vector<std::pair<K,V>> lftvec;
-       std::vector<std::pair<K,V>> rgtvec;
        for(auto thsitr = begin(); thsitr != end(); ++thsitr){
-         lftvec.push_back(*thsitr);
+         if(rhs.count((*thsitr).first) == 0){
+            return false;
+         }
        }
-       for(auto whtitr = begin(); whtitr != end(); ++whtitr){
-         rgtvec.push_back(*whtitr);
-       }
-       if(lftvec == rgtvec){
-         return true;
-       }
-       return false;
+       return true;
     }
 
     bool operator!=(const BSTMap<K,V>& rhs) const{
