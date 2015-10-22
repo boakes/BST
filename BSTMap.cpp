@@ -44,12 +44,13 @@ void testone() {
 	
 }
 
-void runTests(){
+bool runTests(){
 	int test_size = 100;
     BSTMap<int, int> firstbst;
 	map<int,int> firstmap;
 	
 	vector<int> randoms;
+
 	for(int i = 0; i<test_size; ++i){
 		randoms.push_back(i);
 	}
@@ -64,12 +65,21 @@ void runTests(){
 	random_shuffle(randoms.begin(), randoms.end()--);
 	for(int i=0; i<test_size; ++i){
 		if(firstbst[randoms[i]]!=firstmap[randoms[i]]){
-			cout << "insert failure: firstbst " << firstbst[randoms[i]] << " should be firstmap " << firstmap[randoms[i]] << "\n";
+			cout << "check with map failed\n";
+			return false;
 		}
 	}	
 	
 	BSTMap<int, int> tsbtsrif(firstbst);
 	
+	const auto a = tsbtsrif;
+	const auto b = firstbst;
+
+	if(a != b){
+		cout << "copy construct failed\n";
+		return false;
+	}
+
 
 	/*
 	//firstbst.callInOrd();
@@ -82,7 +92,7 @@ void runTests(){
 	
 	*/
 
-
+/*
 	cout << firstmap[(firstbst.maxNode(firstbst.getroot()))->nodepr.first];
 	cout << " ";
 	cout << firstbst[(firstbst.maxNode(firstbst.getroot()))->nodepr.first];
@@ -91,7 +101,8 @@ void runTests(){
 	cout << " ";
 	cout << firstbst[(firstbst.minNode(firstbst.getroot()))->nodepr.first];
 	cout << "\n";
-	
+*/ 
+	return true;	
 }
 
 bool equalitytest(){

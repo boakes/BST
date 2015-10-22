@@ -3,7 +3,7 @@
 
 #include <iostream> 
 #include <stdlib.h>
-
+#include <vector> 
 template<typename K,typename V>
 class BSTMap {
     
@@ -35,17 +35,13 @@ public:
     class const_iterator;
 
     class iterator {
-        // TODO: Iterator data. I keep a Node* and a bool that tells me if it is at end.
+
         Node* loc; 
         bool itrend;
     public:
         friend class const_iterator;
-        iterator(Node* l,bool b):loc(l),itrend(b){
-            if (loc == nullptr){
-                itrend = true;
-            }
-        }
-        // TODO: Other constructors as needed.
+        iterator(Node* l,bool b):loc(l),itrend(b){}
+
         Node* Successor(Node* x){
          if (x->right != nullptr){
             return BSTMap<K,V>::minNode(x->right);
@@ -62,12 +58,12 @@ public:
          if (x->left != nullptr){
             return BSTMap<K,V>::maxNode(x->left);
          } 
-          Node* y = x->parent;
-          while (y != nullptr && x == y->left){
+         Node* y = x->parent;
+         while (y != nullptr && x == y->left){
                 x = y;
                 y = y->parent;
-            }
-            return y;
+         }
+         return y;
         }
 
         bool operator==(const iterator &i) const { 
@@ -109,14 +105,9 @@ public:
         bool itrend;
     public:
         friend class BSTMap<K,V>;  // You might not need this in your code, but it helped me.
-        const_iterator(Node* l,bool b):loc(l),itrend(b) {
-            if (loc == nullptr){
-                itrend = true;
-            }
-        }
+        const_iterator(Node* l,bool b):loc(l),itrend(b) {}
         // TODO: Other constructors as needed.
         const_iterator(const iterator &iter):loc(iter.loc),itrend(iter.itrend){}
-
 
         Node* Successor(Node* x){
          if (x->right != nullptr){
@@ -134,8 +125,8 @@ public:
          if (x->left != nullptr){
             return BSTMap<K,V>::maxNode(x->left);
          } 
-          Node* y = x->parent;
-          while (y != nullptr && x == y->left){
+         Node* y = x->parent;
+         while (y != nullptr && x == y->left){
                 x = y;
                 y = y->parent;
             }
@@ -200,7 +191,12 @@ public:
         }
     }
     BSTMap &operator=(const BSTMap<K,V> &that) {
-        // TODO
+        clear();
+        root = nullptr;
+        sz = 0; 
+        for(auto x=that.begin();x!=that.end();++x){
+            insert(*x);
+        }
     }
 
     bool empty() const {return sz == 0;}
@@ -293,8 +289,6 @@ public:
         }
     }
 
-    
-
     unsigned int erase(const key_type& k){
         if(count(k) == 0){
             return 0;
@@ -337,47 +331,66 @@ public:
         }
     }
 
+
     mapped_type &operator[](const K &key){
-        return (*find(key)).second;
+        if(count(key) == 1){
+            return (*find(key)).second;
+        }else{
+            mapped_type output;
+            insert(std::make_pair(key,output)); 
+            return (*find(key)).second;
+        }
     }
 
     bool operator==(const BSTMap<K,V>& rhs) const{
        if(sz != rhs.sz){
         return false;
        }
-       auto rightitr = rhs.begin();
-       for(auto strt = begin(); strt != end(); ++strt){
-          if(strt != rightitr){
-            return false;
-          }
-          ++rightitr;
+       std::vector<std::pair<K,V>> lftvec;
+       std::vector<std::pair<K,V>> rgtvec;
+       for(auto thsitr = begin(); thsitr != end(); ++thsitr){
+         lftvec.push_back(*thsitr);
        }
-       return true;
+       for(auto whtitr = begin(); whtitr != end(); ++whtitr){
+         rgtvec.push_back(*whtitr);
+       }
+       if(lftvec == rgtvec){
+         return true;
+       }
+       return false;
     }
 
     bool operator!=(const BSTMap<K,V>& rhs) const{
-       return !(this == rhs);
+        return !(*this == rhs);
     }
 
-    iterator begin() {return iterator(minNode(root),false);}
-
-    const_iterator begin() const { return const_iterator(minNode(root),false); }
-
-    iterator end() { return iterator(maxNode(root),true); }
+    iterator begin() {
+        if(sz == 0){
+            return end();
+        }else {
+            return iterator(minNode(root),false);
+        }
+    }
+    const_iterator begin() const { 
+        if(sz == 0){
+            return cend();
+        }else {
+            return const_iterator(minNode(root),false); 
+        }
+    }
+    iterator end() {return iterator(maxNode(root),true); }
 
     const_iterator end() const { return const_iterator(maxNode(root),true); }
 
-    const_iterator cbegin() const { return const_iterator(minNode(root),false); }
-
+    const_iterator cbegin() const { 
+        if(sz == 0){
+            return cend();
+        }else {
+            return const_iterator(minNode(root),false); 
+        }
+    }
     const_iterator cend() const { return const_iterator(maxNode(root),true); }
 
-    void inorderTree(Node* x){
-        inorderTree(x->left);
-        std::cout << x->nodepr.first << "\n";
-        inorderTree(x->right);
-    }
-
 };
-
 
 #endif
