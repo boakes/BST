@@ -105,7 +105,7 @@ void chartest() {
 
 
 bool runTests(){
-	int test_size = 200000;
+	int test_size = 20000;
     BSTMap<int, int> firstbst;
 	map<int,int> firstmap;
 	
@@ -114,9 +114,9 @@ bool runTests(){
 	for(int i = 0; i<test_size; ++i){
 		randoms.push_back(i);
 	}
-	//cout << randoms[0] << "\n";
+	cout << randoms[0] << "\n";
     random_shuffle(randoms.begin(), randoms.end());
-	//cout << randoms[0] << "\n";
+	cout << randoms[0] << "\n";
 	for(int i=0; i<test_size; ++i){
 	    firstbst.insert(make_pair(randoms[i],randoms[i]));
 		firstmap.insert(make_pair(randoms[i],randoms[i]));
@@ -130,9 +130,9 @@ bool runTests(){
 		}
 	}	
 	
-/*
+	cout << "Copyconstructor\n";
 	BSTMap<int, int> tsbtsrif(firstbst);
-	
+	cout << "Copy constructor finished \n";
 	const auto a = tsbtsrif;
 	const auto b = firstbst;
 
@@ -150,7 +150,6 @@ bool runTests(){
 	cout << firstbst[(firstbst.minNode(firstbst.getroot()))->nodepr.first];
 	cout << "\n";
 
-
 	firstbst.clear();
 	random_shuffle(randoms.begin(), randoms.end());
 	//cout << randoms[0] << "\n";
@@ -167,8 +166,6 @@ bool runTests(){
 		firstmap.insert(make_pair(randoms[i],randoms[i]));
 	}
 	
-	
-*/ 
 
 	return true;	
 }
@@ -180,8 +177,8 @@ int main(){
     runTests();
 	auto t2 = std::chrono::high_resolution_clock::now();
     std::cout << "test function took "
-           	  << std::chrono::duration_cast<std::chrono::milliseconds>(t2-t1).count()/1000
-              << " seconds\n";
+           	  << std::chrono::duration_cast<std::chrono::milliseconds>(t2-t1).count()///1000
+              << " milliseconds\n";
 /*	
 
 	cout << "\n---------RunTests passed---------\n";
