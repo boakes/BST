@@ -166,13 +166,13 @@ public:
     };
 
     static Node* maxNode(Node* x){
-        while (x != nullptr && x->right != nullptr){
+        while (x->right != nullptr){
             x = x->right;
         } return x;
     }
 
     static Node* minNode(Node* x){
-        while (x != nullptr && x->left != nullptr){
+        while (x->left != nullptr){
             x = x->left;
         } return x;
     }
@@ -184,7 +184,6 @@ public:
     ~BSTMap(){
        clear();
     }
-
     void helpCopier(Node *x){
         if(x!=nullptr){
             insert(x->nodepr);
@@ -192,7 +191,6 @@ public:
             helpCopier(x->right);
         }
     }
-
 
     BSTMap(const BSTMap<K,V> &that){
         root = nullptr; 
@@ -298,24 +296,16 @@ public:
     }
 
     unsigned int erase(const key_type& k){
-        if(count(k) == 0){
+        Node* z = fancy_find(root,k);
+        if(z == nullptr){
             return 0;
         }else{
-            erase(find(k));
-            return 1;
-        }  
-    }
-
-    iterator erase(const_iterator position){
-        iterator itertmp(position.loc,position.itrend);
-        ++itertmp;
-        Node* z = position.loc;
-        Node* tmp = z;
-        if(z->left == nullptr){
+         Node* tmp = z; 
+            if(z->left == nullptr){
                 transplant(z,z->right);
-        }else if(z->right == nullptr){
+            }else if(z->right == nullptr){
                 transplant(z,z->left);
-        }else { 
+            }else { 
                 Node* y = minNode(z->right);
                 if(y->parent != z){
                   transplant(y,y->right);
@@ -325,10 +315,18 @@ public:
                 transplant(z,y);
                 y->left = z->left;
                 y->left->parent = y;
+            }
+            delete tmp;
+            --sz;
+            return 1;
         }
-        delete tmp;
-        --sz;
-        return itertmp;
+    }
+
+    iterator erase(const_iterator position){
+        iterator tmp(position.loc,position.itrend);
+        ++tmp; 
+        erase((*position).first);
+        return tmp;
     }
 
     void cleartree(Node* x){  
@@ -336,7 +334,6 @@ public:
             if(x->left!=nullptr)cleartree(x->left);
             if(x->right!=nullptr)cleartree(x->right);
             delete x;
-            --sz;
         }
     }
 
@@ -347,16 +344,12 @@ public:
     }
 
     mapped_type &operator[](const K &key){
-         if(count(key) == 1){
-            return (*find(key)).second;
-        }else{
-            std::pair<K,V> jk;
-            jk.first = key;
-            auto x = insert(jk); 
-            return (*(x.first)).second;
-        }
+        std::pair<K,V> jk;
+        jk.first = key;
+        auto tmp = insert(jk); 
+        return (*(tmp.first)).second;
    }
-
+   
     bool operator==(const BSTMap<K,V>& rhs) const{
        if(sz != rhs.sz){
         return false;
@@ -380,10 +373,15 @@ public:
             return iterator(minNode(root),false);
         }
     }
+    
     const_iterator begin() const { return cbegin();}
     
     iterator end() {
-        return iterator(maxNode(root),true); 
+        if(sz == 0){
+            return iterator(root,true); 
+        }else {
+            return iterator(maxNode(root),true); 
+        }
     }
 
     const_iterator end() const { return cend(); }
@@ -396,7 +394,11 @@ public:
         }
     }
     const_iterator cend() const { 
-         return const_iterator(maxNode(root),true);
+        if(sz == 0){
+            return const_iterator(root,true);
+        } else {
+            return const_iterator(maxNode(root),true);
+        }
     }
 
 };

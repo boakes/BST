@@ -105,7 +105,7 @@ void chartest() {
 
 
 bool runTests(){
-	int test_size = 20000;
+	int test_size = 2000000;
     BSTMap<int, int> firstbst;
 	map<int,int> firstmap;
 	
@@ -114,14 +114,21 @@ bool runTests(){
 	for(int i = 0; i<test_size; ++i){
 		randoms.push_back(i);
 	}
-	cout << randoms[0] << "\n";
+	//cout << randoms[0] << "\n";
     random_shuffle(randoms.begin(), randoms.end());
-	cout << randoms[0] << "\n";
+	//cout << randoms[0] << "\n";
+
+	auto t1a = std::chrono::high_resolution_clock::now();
 	for(int i=0; i<test_size; ++i){
 	    firstbst.insert(make_pair(randoms[i],randoms[i]));
 		firstmap.insert(make_pair(randoms[i],randoms[i]));
 	}
-	
+	auto t2a = std::chrono::high_resolution_clock::now();
+
+   std::cout << "inserting " << test_size << " took "
+           	  << std::chrono::duration_cast<std::chrono::milliseconds>(t2a-t1a).count()///1000
+              << " milliseconds\n";
+
 	random_shuffle(randoms.begin(), randoms.end()--);
 	for(int i=0; i<test_size; ++i){
 		if(firstbst[randoms[i]]!=firstmap[randoms[i]]){
@@ -133,23 +140,22 @@ bool runTests(){
 	cout << "Copyconstructor\n";
 	BSTMap<int, int> tsbtsrif(firstbst);
 	cout << "Copy constructor finished \n";
+	
 	const auto a = tsbtsrif;
 	const auto b = firstbst;
 
 	if(a != b){
-		cout << "copy construct failed\n";
+		cout << "copy construct worked\n";
 		return false;
 	}
 
-	cout << firstmap[(firstbst.maxNode(firstbst.getroot()))->nodepr.first];
-	cout << " ";
-	cout << firstbst[(firstbst.maxNode(firstbst.getroot()))->nodepr.first];
-	cout << "\n";
-	cout << firstmap[(firstbst.minNode(firstbst.getroot()))->nodepr.first];
-	cout << " ";
-	cout << firstbst[(firstbst.minNode(firstbst.getroot()))->nodepr.first];
-	cout << "\n";
-
+	firstbst[2000000];
+	auto x = firstbst.find(2000000);
+	auto y = firstbst.insert(make_pair(2000000,1));
+	if(x == y.first && ((*x).second) != 1){
+		cout << "SUCCESS!\n";
+	}
+	/*
 	firstbst.clear();
 	random_shuffle(randoms.begin(), randoms.end());
 	//cout << randoms[0] << "\n";
@@ -163,9 +169,9 @@ bool runTests(){
 	//cout << randoms[0] << "\n";
 	for(int i=0; i<test_size; ++i){
 	    firstbst.insert(make_pair(randoms[i],randoms[i]));
-		firstmap.insert(make_pair(randoms[i],randoms[i]));
+		//firstmap.insert(make_pair(randoms[i],randoms[i]));
 	}
-	
+	*/
 
 	return true;	
 }
