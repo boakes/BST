@@ -197,10 +197,11 @@ public:
     BSTMap(const BSTMap<K,V> &that){
         root = nullptr; 
         sz = 0; 
-        for(auto x=that.begin();x!=that.end();++x){
-            insert(*x);
+        for(auto x=that.cbegin();x!=that.cend();++x){
+            this->insert(*x);
         }
     }
+
     BSTMap &operator=(const BSTMap<K,V> &that) {
         clear();
         root = nullptr;
@@ -224,7 +225,7 @@ public:
             return fancy_find(nd->left,k);
         } else if (k > nd->nodepr.first){
             return fancy_find(nd->right,k);
-        } 
+        } else return nd;
     }
 
     iterator find(const key_type& k){
@@ -255,8 +256,9 @@ public:
     }
 
     std::pair<iterator,bool> insert(const value_type& val){
-        if(count(val.first) == 1){
-            return std::make_pair(find(val.first),false);
+        iterator tmp = find(val.first)
+        if(tmp != end()){
+            return std::make_pair(tmp,false);
         }
         Node* z = new Node(nullptr,nullptr,nullptr,val.first,val.second);
         Node* y = nullptr;
@@ -276,7 +278,6 @@ public:
         } else{
             y->right = z;
         }
-
         return std::make_pair(iterator(z,false),true);
 
     }
@@ -300,16 +301,25 @@ public:
     }
 
     unsigned int erase(const key_type& k){
-        if(count(k) == 0){
+        const_iterator x = find(k);
+        if(x == cend()){
             return 0;
         }else{
-         Node* z = fancy_find(root,k);
-         Node* tmp = z; 
-            if(z->left == nullptr){
+            erase(x);
+            return 1;
+        }  
+    }
+
+    iterator erase(const_iterator position){
+        iterator itertmp(position.loc,position.itrend);
+        ++itertmp;
+        Node* z = position.loc;
+        Node* tmp = z;
+        if(z->left == nullptr){
                 transplant(z,z->right);
-            }else if(z->right == nullptr){
+        }else if(z->right == nullptr){
                 transplant(z,z->left);
-            }else { 
+        }else { 
                 Node* y = minNode(z->right);
                 if(y->parent != z){
                   transplant(y,y->right);
@@ -319,36 +329,37 @@ public:
                 transplant(z,y);
                 y->left = z->left;
                 y->left->parent = y;
-            }
-            delete tmp;
-            --sz;
-            return 1;
         }
-       
+        delete tmp;
+        --sz;
+        return itertmp;
     }
 
-    iterator erase(const_iterator position){
-        auto tmp = find((*position).first);
-        ++tmp; 
-        erase((*position).first);
-        return tmp;
+    void cleartree(Node* x){  
+        if(x!=nullptr){
+            if(x->left!=nullptr)cleartree(x->left);
+            if(x->right!=nullptr)cleartree(x->right);
+            delete x;
+            --sz;
+        }
     }
 
     void clear(){
-        while(sz!=0){
-            erase(root->nodepr.first);
-        }
+        if(root!= nullptr) cleartree(root);
+        sz = 0;
+        root = nullptr;
     }
 
 
     mapped_type &operator[](const K &key){
-        if(count(key) == 1){
-            return (*find(key)).second;
+        std::pair<K,V> jk;
+        jk.first = key;
+        auto x = insert(jk); 
+        if(tmp != end()){
+            return (*tmp).second;
         }else{
-            std::pair<K,V> jk;
-            jk.first = key;
-            insert(jk); 
-            return (*find(key)).second;
+            
+            return x.first;
         }
     }
 
